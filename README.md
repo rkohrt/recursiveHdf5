@@ -35,4 +35,5 @@ rootDataConfig_LeafFactors = 13
 
 ## Contributors
 [Ralf Kohrt](https://github.com/rkohrt)
+
 [Madis Ollikainen](https://github.com/madisollikainen)
