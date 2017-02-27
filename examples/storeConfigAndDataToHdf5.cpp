@@ -17,7 +17,7 @@
 #include <string>
 #include <iostream>
 
-#include "rootData.hpp"
+#include "rootDataConfig.hpp"
 #include "storableWrapper.hpp"
 #include "hdf5Helper.hpp"
 #include "dataWriterHdf5.hpp"
@@ -36,19 +36,19 @@ int main(int argc, const char* argv[] ) {
         std::cout << "file " << argv[1] << " does already exist" << std::endl;
     }
     hid_t fileId = Hdf5Helper::openFile(p);
- 
-    //generate data
-    std::shared_ptr<rootData> root = std::make_shared<rootData>();
 
     std::vector< std::string > overwrite = {""}; //can be used to programmatically overwrite given parameters
-    std::vector< std::tuple<std::string, std::string, double > > confScalarPar = { std::make_tuple("Scalar_1", "This is an example config variable of type double with a Description", 1.5), 
-                                                                                  std::make_tuple("Scalar_2", "This is an other example config variable of type double with a Description", 2.5) };
-    std::vector< std::tuple<std::string, std::string, std::vector<int> > > confVectorPar = { std::make_tuple("Vector_1", "This is an example config variable of type std::vector<double> with a Description", std::vector<int> { 100, 50 ,11 }) };
+    std::vector< std::tuple<std::string, std::string, double > > confScalarPar = { std::make_tuple("rootDataConfig_ValueData1", "This is the value used for the vector data1", 1.5), 
+                                                                                  std::make_tuple("rootDataConfig_ValueData2", "This is the value used for the vector data1", 2.5) };
+    std::vector< std::tuple<std::string, std::string, std::vector<double> > > confVectorPar = { std::make_tuple("rootDataConfig_LeafFactors", "This is the factor used by rootDataConfig to determine the value of its leafs", std::vector<double> { 100.1, 50.5 ,11.11, -3.42 }) };
     std::vector< std::tuple<std::string, std::string, std::string > > confStringPar;  //String parameteres are not supported by the hdf5 beckend yet
-    Config<double, int> config(configFile, confScalarPar, confVectorPar, confStringPar, overwrite);
+    Config<double, double> config(configFile, confScalarPar, confVectorPar, confStringPar, overwrite);
+
+    //generate data
+    std::shared_ptr<rootDataConfig> root = std::make_shared<rootDataConfig>(config);
 
     if(!Hdf5Helper::doesGroupExist("recursiveOutput",fileId)) {
-        dataWriterHdf5<double, int> d(fileId, "recursiveOutput");
+        dataWriterHdf5<double, double> d(fileId, "recursiveOutput");
         d.store(config, std::make_shared<storableWrapper >( root ));
     }
     H5Fclose(fileId);
