@@ -33,8 +33,8 @@
 namespace RecHDF
 {
 
-    template < typename float_t, typename int_t >
-    class dataWriterHdf5: public dataWriter<float_t, int_t>
+    template < typename scalar_t, typename vector_t >
+    class dataWriterHdf5: public dataWriter<scalar_t, vector_t>
     {
     protected:
         boost::filesystem::path file;
@@ -94,7 +94,7 @@ namespace RecHDF
         ~dataWriterHdf5() {
             closeFile();
         }
-        virtual void store( Config<float_t, int_t>& config, std::shared_ptr<storableWrapper> C) override {
+        virtual void store( Config<scalar_t, vector_t>& config, std::shared_ptr<storableWrapper> C) override {
             store(groupId, config);    
             store(groupId, C);            
         }
@@ -102,7 +102,7 @@ namespace RecHDF
             store(groupId, C);            
         }
 
-        static void store(hid_t group, Config<float_t, int_t>& config) {
+        static void store(hid_t group, Config<scalar_t, vector_t>& config) {
             typedef boost::program_options::variables_map::const_iterator iter;
             boost::program_options::variables_map& m = config.getMap();
 
