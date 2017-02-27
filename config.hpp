@@ -41,7 +41,7 @@ namespace RecHDF
 {
 
     // A class which will hold the configuration as well as read it 
-    template < typename float_t, typename int_t >
+    template < typename scalar_t, typename vector_t >
     class Config
     {
     public: 
@@ -57,10 +57,9 @@ namespace RecHDF
         //  2) 2nd entry == string for parameter description
         //  3) 3rd entry == numeric for default value
 
-        Config(  std::string cfile, 
-                    std::vector< std::tuple<std::string, std::string, float_t > > floats,
-                    std::vector< std::tuple<std::string, std::string, std::vector<float_t> > > float_vec,
-                    std::vector< std::tuple<std::string, std::string, int_t > > ints, 
+        Config(  boost::filesystem::path cfile, 
+                    std::vector< std::tuple<std::string, std::string, scalar_t > > scalars,
+                    std::vector< std::tuple<std::string, std::string, std::vector<vector_t> > > vectors, 
                     std::vector< std::tuple<std::string, std::string, std::string > > strings, 
                     std::vector< std::string >& overwrite_values)
             : file_(cfile)
@@ -72,33 +71,23 @@ namespace RecHDF
             // Generate the structure for the configVM
             boost::program_options::options_description desc("Config");
             
-            // Loop over the float_t variables
-            for( uint i=0; i < floats.size(); ++i)
+            // Loop over the scalar_t variables
+            for( uint i=0; i < scalars.size(); ++i)
             {
                 desc_.add_options()
-                    (   (std::get<0>(floats[i])).c_str(),
-                        boost::program_options::value<float_t>()->default_value((std::get<2>(floats[i]))),
-                        (std::get<1>(floats[i])).c_str()
+                    (   (std::get<0>(scalars[i])).c_str(),
+                        boost::program_options::value<scalar_t>()->default_value((std::get<2>(scalars[i]))),
+                        (std::get<1>(scalars[i])).c_str()
                     );
             }
             
-            // Loop over the float_t-vector variables
-            for( uint i=0; i < float_vec.size(); ++i)
+            // Loop over the vector_t-vector variables
+            for( uint i=0; i < vectors.size(); ++i)
             {
                 desc_.add_options()
-                    (   (std::get<0>(float_vec[i])).c_str(),
-                        boost::program_options::value<std::vector<float_t>>()->default_value((std::get<2>(float_vec[i])), std::to_string(std::get<2>(float_vec[i])[0])),
-                        (std::get<1>(float_vec[i])).c_str()
-                    );
-            }
-
-            // Loop over the int_t variables
-            for( uint i=0; i < ints.size(); ++i)
-            {
-                desc_.add_options()
-                    (   (std::get<0>(ints[i])).c_str(), 
-                        boost::program_options::value<int_t>()->default_value((std::get<2>(ints[i]))), 
-                        (std::get<1>(ints[i])).c_str()
+                    (   (std::get<0>(vectors[i])).c_str(),
+                        boost::program_options::value<std::vector<vector_t>>()->default_value((std::get<2>(vectors[i])), std::to_string(std::get<2>(vectors[i])[0])),
+                        (std::get<1>(vectors[i])).c_str()
                     );
             }
 
@@ -122,7 +111,7 @@ namespace RecHDF
             }
 
             // Open the configuration file
-            std::ifstream ifs(file_);
+            std::ifstream ifs(file_.string());
 
             if (!ifs)
             {
@@ -133,23 +122,6 @@ namespace RecHDF
             {
                 store(parse_config_file(ifs, desc_), par_);
                 notify(par_);
-
-                #ifndef NDEBUG
-                    #ifdef VERBOSE
-                    // For testing
-                    typedef boost::program_options::variables_map::const_iterator iter;
-
-                    for ( iter i = par_.begin(); i != par_.end(); i++ )
-                    {
-                        std::cout << i->first << " = ";
-                        try { std::cout << i->second.as<float_t>() << std::endl;
-                        } catch(...) {/* do nothing */ }
-                        try { std::cout << i->second.as<int_t>() << std::endl;
-                        } catch(...) {/* do nothing */ }
-                         
-                    }
-                    #endif
-                #endif
             }
      
             } // end try
@@ -163,8 +135,7 @@ namespace RecHDF
         }   // end constructor
 
 
-        // Templated method for checkign is a variable is in par_ variable map
-        //template< typename T > 
+        // method for checkign is a variable is in par_ variable map
         bool count(std::string name)
         {
             if ( par_.count(name) )
@@ -216,7 +187,7 @@ namespace RecHDF
     private:
 
         // Configuration file 
-        std::string file_;
+        boost::filesystem::path file_;
         
         // The name-value variable map for the configuration
         boost::program_options::variables_map par_;
