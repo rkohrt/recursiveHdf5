@@ -43,12 +43,12 @@ int main(int argc, const char* argv[] ) {
     std::vector< std::string > overwrite = {""}; //can be used to programmatically overwrite given parameters
     std::vector< std::tuple<std::string, std::string, double > > confScalarPar = { std::make_tuple("Scalar_1", "This is an example config variable of type double with a Description", 1.5), 
                                                                                   std::make_tuple("Scalar_2", "This is an other example config variable of type double with a Description", 2.5) };
-    std::vector< std::tuple<std::string, std::string, std::vector<double> > > confVectorPar = { std::make_tuple("Vector_1", "This is an example config variable of type std::vector<double> with a Description", std::vector<double> { 100.0, 50.0 ,11.1 }) };
+    std::vector< std::tuple<std::string, std::string, std::vector<int> > > confVectorPar = { std::make_tuple("Vector_1", "This is an example config variable of type std::vector<double> with a Description", std::vector<int> { 100, 50 ,11 }) };
     std::vector< std::tuple<std::string, std::string, std::string > > confStringPar;  //String parameteres are not supported by the hdf5 beckend yet
-    Config<double, double> config(configFile, confScalarPar, confVectorPar, confStringPar, overwrite);
+    Config<double, int> config(configFile, confScalarPar, confVectorPar, confStringPar, overwrite);
 
     if(!Hdf5Helper::doesGroupExist("recursiveOutput",fileId)) {
-        dataWriterHdf5<double, double> d(fileId, "recursiveOutput");
+        dataWriterHdf5<double, int> d(fileId, "recursiveOutput");
         d.store(config, std::make_shared<storableWrapper >( root ));
     }
     H5Fclose(fileId);
