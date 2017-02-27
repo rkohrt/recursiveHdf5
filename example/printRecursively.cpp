@@ -15,7 +15,7 @@
 #include <iostream>
 
 #include "rootData.hpp"
-#include "storageWrapper.hpp"
+#include "storableWrapper.hpp"
 
 using namespace RecHDF;
 

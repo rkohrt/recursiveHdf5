@@ -15,7 +15,7 @@
 #ifndef LEAF_DATA_HEADER
 #define LEAF_DATA_HEADER
 
-#include "storageWrapper.hpp"
+#include "storableWrapper.hpp"
 #include "dataBuilder.hpp"
 
 namespace RecHDF

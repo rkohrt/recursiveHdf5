@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef STORAGE_WRAPPER_HEADER
-#define STORAGE_WRAPPER_HEADER
+#ifndef STORABLE_WRAPPER_HEADER
+#define STORABLE_WRAPPER_HEADER
 
 #include <vector>
 #include <string>
@@ -99,4 +99,4 @@ namespace RecHDF
 
 
 }
-#endif //STORAGE_WRAPPER_HEADER
+#endif //STORABLE_WRAPPER_HEADER

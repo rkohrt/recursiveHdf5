@@ -20,7 +20,7 @@
 #include <memory>
 #include <utility>
 
-#include "storageWrapper.hpp"
+#include "storableWrapper.hpp"
 
 namespace RecHDF
 {
