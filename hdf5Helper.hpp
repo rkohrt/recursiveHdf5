@@ -29,17 +29,9 @@ namespace RecHDF
 {
     namespace Hdf5Helper
     {
-        //writes an attribute of name 'name' and value 'val' to the hdf5 group (or file) 'id'
+        //returns the hdf5 native variable type (>0) of given variable 'val' or a negative value if the given variable type is not supported
         template<typename T>
-        void writeAttribute(hid_t const & id, std::string const & name, T const & val) {
-            if(H5Aexists(id, name.c_str())) {
-                throw std::runtime_error("attribute " + name + " already exists");
-                return;
-            }
-            
-            hsize_t dims[] = {1};
-            auto dataspace_id = H5Screate_simple(1, dims, NULL);
-            hid_t attribute_id;
+        hid_t getHdf5Type() {
             hid_t type = H5T_NATIVE_INT;
             if(std::is_same<T, double>::value)
                 type = H5T_NATIVE_DOUBLE;
@@ -51,29 +43,57 @@ namespace RecHDF
                 type = H5T_NATIVE_ULLONG;
             else {
                 throw std::runtime_error("unkown variable type <"+getTypeName<T>()+"> to store as an Attribute");
-                return;
+                return -1;
             }
-            attribute_id = H5Acreate2 (id, name.c_str(), type, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
-            H5Awrite(attribute_id, type, &val);
-            H5Sclose(dataspace_id);
-            H5Aclose(attribute_id);
+            return type;
         }
 
-        template<>
-        void writeAttribute<std::vector<double>>(hid_t const & id, std::string const & name, std::vector<double> const & val) {
+        //trick to make partial template specialisation work
+        template<typename T>
+        struct writeAttrStruct {
+            static void impl(hid_t const & id, std::string const & name, T const & val) {
+                
+                hsize_t dims[] = {1};
+                auto dataspace_id = H5Screate_simple(1, dims, NULL);
+                hid_t attribute_id;
+                hid_t type = getHdf5Type<T>();
+                if(type < 0) {
+                    return;
+                }
+                attribute_id = H5Acreate2 (id, name.c_str(), type, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
+                H5Awrite(attribute_id, type, &val);
+                H5Sclose(dataspace_id);
+                H5Aclose(attribute_id);
+            }
+        };
+
+        template<typename T>
+        struct writeAttrStruct<std::vector<T>> {
+            static void impl(hid_t const & id, std::string const & name, std::vector<T> const & val) {
+
+                hsize_t dims[] = {val.size()};
+                auto dataspace_id = H5Screate_simple(1, dims, NULL);
+                hid_t attribute_id;
+                hid_t type = getHdf5Type<T>();
+                if(type < 0) {
+                    return;
+                }
+                attribute_id = H5Acreate2 (id, name.c_str(), type, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
+                H5Awrite(attribute_id, type, val.data());
+                H5Sclose(dataspace_id);
+                H5Aclose(attribute_id);
+            }
+        };
+
+
+        //writes an attribute of name 'name' and value 'val' to the hdf5 group (or file) 'id'
+        template<typename T>
+        void writeAttribute(hid_t const & id, std::string const & name, T const & val) {
             if(H5Aexists(id, name.c_str())) {
                 throw std::runtime_error("attribute " + name + " already exists");
                 return;
             }
-            
-            hsize_t dims[] = {val.size()};
-            auto dataspace_id = H5Screate_simple(1, dims, NULL);
-            hid_t attribute_id;
-            hid_t type = H5T_NATIVE_DOUBLE;
-            attribute_id = H5Acreate2 (id, name.c_str(), type, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
-            H5Awrite(attribute_id, type, val.data());
-            H5Sclose(dataspace_id);
-            H5Aclose(attribute_id);
+            writeAttrStruct<T>::impl(id, name, val);
         }
 
         // writes a vector of data to the hdf5 group 'group' as a dataset with the name 'name' 

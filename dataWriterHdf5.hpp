@@ -111,10 +111,14 @@ namespace RecHDF
                 std::string attrName = "config_"+i->first;
                 {
                     try {
-                        Hdf5Helper::writeAttribute<std::vector<double>>(group,attrName,i->second.as<std::vector<double>>()); 
+                        Hdf5Helper::writeAttribute<std::vector<vector_t>>(group,attrName,i->second.as<std::vector<vector_t>>()); 
                         continue;  
                     } catch(...) {/* do nothing */ } 
                 }
+                try { 
+                    Hdf5Helper::writeAttribute<scalar_t>(group,attrName,i->second.as<scalar_t>()); 
+                    continue;   
+                } catch(...) {/* do nothing */ }
                 try { 
                     Hdf5Helper::writeAttribute<double>(group,attrName,i->second.as<double>()); 
                     continue;   
