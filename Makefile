@@ -13,7 +13,10 @@ HDF5LIB		= -lhdf5
 
 all: examples
 
-examples: example/printRecursively
+examples: example/printRecursively example/storeRecursivelyToHdf5
 
 example/printRecursively: example/printRecursively.cpp ${library_headers} *.hpp
+	${CC} ${CFLAGS} ${OPT} ${HDF5LIB} -I${HEADERS} -I./  $< -o $@
+
+example/storeRecursivelyToHdf5: example/storeRecursivelyToHdf5.cpp ${library_headers} *.hpp
 	${CC} ${CFLAGS} ${OPT} ${HDF5LIB} ${BOOSTLIB} -I${HEADERS} -I./  $< -o $@
