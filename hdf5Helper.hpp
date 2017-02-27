@@ -146,6 +146,20 @@ namespace RecHDF
                 return H5Fcreate(file.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT); 
         }
 
+        //Checks if the hfd5 group (or file) parent has a group of the name 'name'
+        bool doesGroupExist(std::string name, hid_t parent) {
+            size_t pos = name.find("/");
+            if(pos == std::string::npos) {
+                return H5Lexists(parent, name.c_str(), H5P_DEFAULT)>0;
+            } else if(H5Lexists(parent, name.substr(0,pos).c_str(), H5P_DEFAULT)>0) {
+                hid_t tmp = H5Gopen(parent, name.substr(0,pos).c_str(), H5P_DEFAULT); 
+                bool ret = doesGroupExist(name.erase(0,pos+1),tmp);
+                H5Gclose(tmp);
+                return ret;
+            } else
+                return false;
+        }
+
     };
 }
 
