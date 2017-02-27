@@ -23,14 +23,14 @@ make
 touch test.conf
 ./build/storeConfigAndDataToHdf5 test.pb test.conf
 ```
-Note: this will use the default configuration as defined in [examples/storeRecursivelyToHdf5.cpp](./examples/storeRecursivelyToHdf5.cpp), to change the values of a parameter change the configuration file, you cna see an example configuration file below.
+Note: this will use the default configuration as defined in [examples/storeRecursivelyToHdf5.cpp](./examples/storeRecursivelyToHdf5.cpp), to change the values of a parameter change the configuration file, you can see an example configuration file below.
 ```
 rootDataConfig_ValueData1 = 9.9
 rootDataConfig_LeafFactors = 12
 rootDataConfig_LeafFactors = 13
 
 ```
-(Notice, that this will only create two leafs below the root)
+(Notice, that by using this configuartion only create two leafs will be created below the root)
 
 
 ## Contributors
