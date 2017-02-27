@@ -42,7 +42,7 @@ namespace RecHDF
             else if(std::is_same<T, std::size_t>::value)
                 type = H5T_NATIVE_ULLONG;
             else {
-                throw std::runtime_error("unkown variable type <"+getTypeName<T>()+"> to store as an Attribute");
+                throw std::runtime_error("unkown variable type <"+getTypeName<T>()+">");
                 return -1;
             }
             return type;
@@ -119,17 +119,8 @@ namespace RecHDF
             
             hsize_t dims[] = {data.size()};            
             hid_t dataSpaceId = H5Screate_simple(1, dims, nullptr);
-            hid_t type = H5T_NATIVE_INT;
-            if(std::is_same<T, double>::value)
-                type = H5T_NATIVE_DOUBLE;
-            else if(std::is_same<T, int>::value)
-                type = H5T_NATIVE_INT;
-            else if(std::is_same<T, long long>::value)
-                type = H5T_NATIVE_LLONG;
-            else if(std::is_same<T, std::size_t>::value)
-                type = H5T_NATIVE_ULLONG;
-            else {
-                throw std::runtime_error("unkown variable type <"+getTypeName<T>()+"> to store as an Dataset");
+            hid_t type = getHdf5Type<T>();
+            if(type < 0) {
                 return 0;
             }
             hid_t dataSetId = H5Dcreate2(group, name.c_str(), type, dataSpaceId, 
