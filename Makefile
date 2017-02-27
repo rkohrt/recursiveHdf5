@@ -4,19 +4,25 @@ CFLAGS	= -std=c++11 -Wall
 OPT 	= -O3 -g
 
 # My directories
-HEADERS	= example
+HEADERS	= examples/data
 library_headers = ${HEADERS}/*.hpp
 
 # 3rd party libraries
 BOOSTLIB 	= -lboost_system -lboost_filesystem -lboost_program_options	
 HDF5LIB		= -lhdf5 
 
-all: examples
+all: build_examples
 
-examples: example/printRecursively example/storeRecursivelyToHdf5
+build_examples: build build/printRecursively build/storeRecursivelyToHdf5
 
-example/printRecursively: example/printRecursively.cpp ${library_headers} *.hpp
+build/printRecursively: examples/printRecursively.cpp ${library_headers} *.hpp
 	${CC} ${CFLAGS} ${OPT} ${HDF5LIB} -I${HEADERS} -I./  $< -o $@
 
-example/storeRecursivelyToHdf5: example/storeRecursivelyToHdf5.cpp ${library_headers} *.hpp
+build/storeRecursivelyToHdf5: examples/storeRecursivelyToHdf5.cpp ${library_headers} *.hpp
 	${CC} ${CFLAGS} ${OPT} ${HDF5LIB} ${BOOSTLIB} -I${HEADERS} -I./  $< -o $@
+
+build:
+	mkdir $@
+
+clean:
+	rm -rf build
